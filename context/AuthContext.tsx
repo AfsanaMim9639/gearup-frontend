@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { api } from "@/lib/api-client";
 import { AuthUser, LoginResponse } from "@/types/auth";
@@ -17,27 +17,27 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-function getStoredUser(): AuthUser | null {
-  if (typeof window === "undefined") return null;
-
-  const storedUser = localStorage.getItem("user");
-  const token = localStorage.getItem("token");
-
-  if (!storedUser || !token) return null;
-
-  try {
-    return JSON.parse(storedUser);
-  } catch {
-    localStorage.removeItem("user");
-    localStorage.removeItem("token");
-    return null;
-  }
-}
-
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<AuthUser | null>(() => getStoredUser());
-  const [isLoading] = useState(false);
+  const [user, setUser] = useState<AuthUser | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    const token = localStorage.getItem("token");
+
+    if (storedUser && token) {
+      try {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setUser(JSON.parse(storedUser));
+      } catch {
+        localStorage.removeItem("user");
+        localStorage.removeItem("token");
+      }
+    }
+    
+    setIsLoading(false);
+  }, []);
 
   const login = async (values: LoginFormValues) => {
     const data = await api.post<LoginResponse>("/auth/login", values);
