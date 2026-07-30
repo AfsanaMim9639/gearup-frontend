@@ -17,6 +17,16 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+function setAuthCookies(token: string, role: string) {
+  document.cookie = `token=${token}; path=/; max-age=${60 * 60 * 24 * 7}`;
+  document.cookie = `role=${role}; path=/; max-age=${60 * 60 * 24 * 7}`;
+}
+
+function clearAuthCookies() {
+  document.cookie = "token=; path=/; max-age=0";
+  document.cookie = "role=; path=/; max-age=0";
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -43,6 +53,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const data = await api.post<LoginResponse>("/auth/login", values);
     localStorage.setItem("token", data.token);
     localStorage.setItem("user", JSON.stringify(data.user));
+    setAuthCookies(data.token, data.user.role);
     setUser(data.user);
 
     const redirectPath =
@@ -63,6 +74,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
+    clearAuthCookies();
     setUser(null);
     router.push("/auth/login");
   };
