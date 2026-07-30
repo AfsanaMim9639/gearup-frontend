@@ -1,0 +1,92 @@
+"use client";
+
+import { createContext, useContext, useState, ReactNode } from "react";
+import { useRouter } from "next/navigation";
+import { api } from "@/lib/api-client";
+import { AuthUser, LoginResponse } from "@/types/auth";
+import { LoginFormValues, RegisterFormValues } from "@/lib/validations/auth";
+
+interface AuthContextType {
+  user: AuthUser | null;
+  isLoading: boolean;
+  isAuthenticated: boolean;
+  login: (values: LoginFormValues) => Promise<void>;
+  register: (values: RegisterFormValues) => Promise<void>;
+  logout: () => void;
+}
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+function getStoredUser(): AuthUser | null {
+  if (typeof window === "undefined") return null;
+
+  const storedUser = localStorage.getItem("user");
+  const token = localStorage.getItem("token");
+
+  if (!storedUser || !token) return null;
+
+  try {
+    return JSON.parse(storedUser);
+  } catch {
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    return null;
+  }
+}
+
+export function AuthProvider({ children }: { children: ReactNode }) {
+  const [user, setUser] = useState<AuthUser | null>(() => getStoredUser());
+  const [isLoading] = useState(false);
+  const router = useRouter();
+
+  const login = async (values: LoginFormValues) => {
+    const data = await api.post<LoginResponse>("/auth/login", values);
+    localStorage.setItem("token", data.token);
+    localStorage.setItem("user", JSON.stringify(data.user));
+    setUser(data.user);
+
+    const redirectPath =
+      data.user.role === "ADMIN"
+        ? "/dashboard/admin"
+        : data.user.role === "PROVIDER"
+        ? "/dashboard/provider"
+        : "/dashboard/customer";
+
+    router.push(redirectPath);
+  };
+
+  const register = async (values: RegisterFormValues) => {
+    await api.post("/auth/register", values);
+    await login({ email: values.email, password: values.password });
+  };
+
+  const logout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    setUser(null);
+    router.push("/auth/login");
+  };
+
+  return (
+    <AuthContext.Provider
+      value={{
+        user,
+        isLoading,
+        isAuthenticated: !!user,
+        login,
+        register,
+        logout,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
+}
+
+export function useAuth() {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
+}
