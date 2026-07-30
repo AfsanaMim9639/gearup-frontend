@@ -38,6 +38,12 @@ export default function RegisterPage() {
     formState: { errors },
   } = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      password: "",
+      role: undefined,
+    },
   });
 
   const onSubmit = async (values: RegisterFormValues) => {
@@ -113,7 +119,10 @@ export default function RegisterPage() {
                 name="role"
                 control={control}
                 render={({ field }) => (
-                  <Select value={field.value} onValueChange={field.onChange}>
+                  <Select
+                    value={field.value ?? ""}
+                    onValueChange={field.onChange}
+                  >
                     <SelectTrigger id="role" className="w-full">
                       <SelectValue placeholder="Select a role" />
                     </SelectTrigger>
