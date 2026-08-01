@@ -38,7 +38,7 @@ export default function GearListingPage() {
               onValueChange={(value) =>
                 setFilters((prev) => ({
                   ...prev,
-                  category: value === "all" ? undefined : value,
+                  category: value === "all" || !value ? undefined : value,
                 }))
               }
             >
