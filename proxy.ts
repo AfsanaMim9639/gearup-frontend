@@ -17,7 +17,7 @@ const protectedPrefixes: { prefix: string; role: Role }[] = [
 
 const authPages = ["/auth/login", "/auth/register"];
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const token = request.cookies.get("token")?.value;
   const role = request.cookies.get("role")?.value as Role | undefined;
@@ -44,9 +44,10 @@ export function middleware(request: NextRequest) {
       return NextResponse.redirect(loginUrl);
     }
 
-    // Logged in but wrong role -> send to login page
+    // Logged in but wrong role -> send to their own dashboard
     if (role !== matchedProtected.role) {
-      return NextResponse.redirect(new URL("/auth/login", request.url));
+      const fallbackPath = role ? roleDashboard[role] : "/auth/login";
+      return NextResponse.redirect(new URL(fallbackPath, request.url));
     }
   }
 
