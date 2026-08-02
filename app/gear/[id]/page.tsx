@@ -4,8 +4,8 @@ import { use } from "react";
 import Image from "next/image";
 import { useGearDetails } from "@/hooks/useGear";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-
+//import { Button } from "@/components/ui/button";
+import { RentNowForm } from "@/components/rent-now-form";
 export default function GearDetailsPage({
   params,
 }: {
@@ -89,9 +89,7 @@ export default function GearDetailsPage({
             </p>
           </div>
 
-          <Button className="mt-6 w-full" size="lg" disabled={!gear.isAvailable}>
-            {gear.isAvailable ? "Rent Now" : "Currently Unavailable"}
-          </Button>
+          <RentNowForm gear={gear} />
         </div>
       </div>
 
