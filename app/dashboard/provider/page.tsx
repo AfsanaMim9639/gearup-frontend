@@ -19,9 +19,18 @@ export default function ProviderDashboardPage() {
             Welcome, {user?.name ?? "Guest"}
           </p>
         </div>
-        <Button variant="destructive" onClick={logout}>
-          Logout
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            nativeButton={false}
+            render={<Link href="/dashboard/provider/orders" />}
+          >
+            Manage Orders
+          </Button>
+          <Button variant="destructive" onClick={logout}>
+            Logout
+          </Button>
+        </div>
       </div>
 
       <div className="mt-8">
