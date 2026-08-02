@@ -96,6 +96,7 @@ export default function CustomerDashboardPage() {
                       {order.status === "CONFIRMED" && (
                         <Button
                           size="sm"
+                          nativeButton={false}
                           render={
                             <Link
                               href={`/dashboard/customer/orders/${order.id}/pay`}
