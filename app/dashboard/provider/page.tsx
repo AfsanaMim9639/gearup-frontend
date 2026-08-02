@@ -5,7 +5,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useProviderGear } from "@/hooks/useProviderGear";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-
+import Link from "next/link";
 export default function ProviderDashboardPage() {
   const { user, logout } = useAuth();
   const { data: gearItems, isLoading, isError } = useProviderGear();
@@ -25,8 +25,16 @@ export default function ProviderDashboardPage() {
       </div>
 
       <div className="mt-8">
+        
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-semibold">Your Gear Listings</h2>
+          <Button
+            size="sm"
+            nativeButton={false}
+            render={<Link href="/dashboard/provider/gear/new" />}
+          >
+            + Add Gear
+          </Button>
         </div>
 
         {isLoading && (
@@ -52,7 +60,7 @@ export default function ProviderDashboardPage() {
                 key={item.id}
                 className="flex items-center gap-4 rounded-lg border p-4"
               >
-                <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-md bg-muted">
+                <div className="relative h-16 w-16 flex-shrink:0 overflow-hidden rounded-md bg-muted">
                   <Image
                     src={item.imageUrl || "/file.svg"}
                     alt={item.name}
