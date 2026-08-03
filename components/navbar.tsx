@@ -1,9 +1,17 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { toast } from "sonner";
-import { ChevronDown, LayoutDashboard, User, Settings, LogOut } from "lucide-react";
+import {
+  ChevronDown,
+  LayoutDashboard,
+  User,
+  Settings,
+  LogOut,
+  Menu,
+} from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -16,14 +24,19 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
-  Avatar,
-  AvatarFallback,
-} from "@/components/ui/avatar";
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 
 export function Navbar() {
   const { user, isAuthenticated, logout } = useAuth();
   const pathname = usePathname();
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   const dashboardPath =
     user?.role === "ADMIN"
@@ -54,6 +67,7 @@ export function Navbar() {
           </span>
         </Link>
 
+        {/* Desktop nav */}
         <nav className="hidden items-center gap-6 sm:flex">
           {navLinks.map((link) => (
             <Link
@@ -82,81 +96,170 @@ export function Navbar() {
         </nav>
 
         <div className="flex items-center gap-2">
-          {isAuthenticated ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger
-                render={
-                  <button className="flex items-center gap-2 rounded-full px-1.5 py-1 outline-none hover:bg-muted">
-                    <Avatar className="h-7 w-7">
-                      <AvatarFallback className="text-xs">
-                        {initials}
-                      </AvatarFallback>
-                    </Avatar>
-                    <span className="hidden text-sm font-medium sm:inline">
-                      {user?.name}
-                    </span>
-                    <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
-                  </button>
-                }
-              />
-              <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuGroup>
-                  <DropdownMenuLabel>
-                    <p className="font-medium">{user?.name}</p>
-                    <p className="text-xs font-normal text-muted-foreground">
-                      {user?.email}
-                    </p>
-                  </DropdownMenuLabel>
-                </DropdownMenuGroup>
-                <DropdownMenuSeparator />
-                <DropdownMenuGroup>
-                  <DropdownMenuItem render={<Link href={dashboardPath} />}>
-                    <LayoutDashboard className="h-4 w-4" />
+          {/* Desktop auth area */}
+          <div className="hidden sm:flex sm:items-center sm:gap-2">
+            {isAuthenticated ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger
+                  render={
+                    <button className="flex items-center gap-2 rounded-full px-1.5 py-1 outline-none hover:bg-muted">
+                      <Avatar className="h-7 w-7">
+                        <AvatarFallback className="text-xs">
+                          {initials}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span className="text-sm font-medium">
+                        {user?.name}
+                      </span>
+                      <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
+                    </button>
+                  }
+                />
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuGroup>
+                    <DropdownMenuLabel>
+                      <p className="font-medium">{user?.name}</p>
+                      <p className="text-xs font-normal text-muted-foreground">
+                        {user?.email}
+                      </p>
+                    </DropdownMenuLabel>
+                  </DropdownMenuGroup>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuGroup>
+                    <DropdownMenuItem render={<Link href={dashboardPath} />}>
+                      <LayoutDashboard className="h-4 w-4" />
+                      Dashboard
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => toast.info("Profile page coming soon")}
+                    >
+                      <User className="h-4 w-4" />
+                      Profile
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => toast.info("Settings page coming soon")}
+                    >
+                      <Settings className="h-4 w-4" />
+                      Settings
+                    </DropdownMenuItem>
+                  </DropdownMenuGroup>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuGroup>
+                    <DropdownMenuItem variant="destructive" onClick={logout}>
+                      <LogOut className="h-4 w-4" />
+                      Logout
+                    </DropdownMenuItem>
+                  </DropdownMenuGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  nativeButton={false}
+                  render={<Link href="/auth/login" />}
+                >
+                  Log in
+                </Button>
+                <Button
+                  size="sm"
+                  className="relative overflow-visible"
+                  nativeButton={false}
+                  render={<Link href="/auth/register" />}
+                >
+                  <span className="navbar-glow" />
+                  Sign up
+                </Button>
+              </>
+            )}
+          </div>
+
+          {/* Mobile hamburger */}
+          <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
+            <SheetTrigger
+              render={
+                <Button variant="ghost" size="icon" className="sm:hidden" />
+              }
+            >
+              <Menu className="h-5 w-5" />
+            </SheetTrigger>
+            <SheetContent side="right" className="w-72">
+              <SheetHeader>
+                <SheetTitle>
+                  <span className="logo-text text-lg font-extrabold">
+                    GearUp
+                  </span>
+                </SheetTitle>
+              </SheetHeader>
+
+              <div className="mt-6 flex flex-col gap-1 px-4">
+                {navLinks.map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    onClick={() => setMobileOpen(false)}
+                    className={cn(
+                      "rounded-md px-3 py-2 text-sm font-medium hover:bg-muted",
+                      pathname === link.href && "bg-muted"
+                    )}
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+
+                {isAuthenticated && (
+                  <Link
+                    href={dashboardPath}
+                    onClick={() => setMobileOpen(false)}
+                    className={cn(
+                      "rounded-md px-3 py-2 text-sm font-medium hover:bg-muted",
+                      pathname.startsWith(dashboardPath) && "bg-muted"
+                    )}
+                  >
                     Dashboard
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => toast.info("Profile page coming soon")}
-                  >
-                    <User className="h-4 w-4" />
-                    Profile
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => toast.info("Settings page coming soon")}
-                  >
-                    <Settings className="h-4 w-4" />
-                    Settings
-                  </DropdownMenuItem>
-                </DropdownMenuGroup>
-                <DropdownMenuSeparator />
-                <DropdownMenuGroup>
-                  <DropdownMenuItem variant="destructive" onClick={logout}>
-                    <LogOut className="h-4 w-4" />
-                    Logout
-                  </DropdownMenuItem>
-                </DropdownMenuGroup>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          ) : (
-            <>
-              <Button
-                variant="ghost"
-                size="sm"
-                nativeButton={false}
-                render={<Link href="/auth/login" />}
-              >
-                Log in
-              </Button>
-              <Button
-                size="sm"
-                className="relative overflow-visible"
-                nativeButton={false}
-                render={<Link href="/auth/register" />}
-              >
-                <span className="navbar-glow" />
-                Sign up
-              </Button>
-            </>
-          )}
+                  </Link>
+                )}
+
+                <div className="mt-4 border-t pt-4">
+                  {isAuthenticated ? (
+                    <div className="space-y-1">
+                      <p className="px-3 text-xs text-muted-foreground">
+                        Signed in as {user?.name}
+                      </p>
+                      <button
+                        onClick={() => {
+                          setMobileOpen(false);
+                          logout();
+                        }}
+                        className="w-full rounded-md px-3 py-2 text-left text-sm font-medium text-destructive hover:bg-destructive/10"
+                      >
+                        Logout
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col gap-2 px-1">
+                      <Button
+                        variant="outline"
+                        nativeButton={false}
+                        render={<Link href="/auth/login" />}
+                        onClick={() => setMobileOpen(false)}
+                      >
+                        Log in
+                      </Button>
+                      <Button
+                        nativeButton={false}
+                        render={<Link href="/auth/register" />}
+                        onClick={() => setMobileOpen(false)}
+                      >
+                        Sign up
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </SheetContent>
+          </Sheet>
         </div>
       </div>
     </header>

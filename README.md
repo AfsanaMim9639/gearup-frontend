@@ -1,36 +1,104 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# GearUp 🏋️ — Frontend
 
-## Getting Started
+**"Rent Sports & Outdoor Gear Instantly"**
 
-First, run the development server:
+A modern, responsive Next.js frontend for the GearUp sports and outdoor gear rental platform. Customers browse gear, place rental orders, and pay via Stripe. Providers manage inventory and fulfill orders. Admins oversee the platform.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+---
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🔗 Links
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Resource            | Link |
+|---------------------|------|
+| Frontend Repo       | https://github.com/your-username/gearup-frontend |
+| Live App            | https://your-frontend-app.vercel.app |
+| Backend Repo        | https://github.com/your-username/gearup-backend |
+| Backend Live API    | https://gearup-virid.vercel.app |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+**Admin Credentials (for testing the deployed app)**
+- Email: `admin@gearup.com`
+- Password: `admin123`
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## 🛠️ Tech Stack
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+| Technology | Purpose |
+|------------|---------|
+| Next.js (App Router) | React framework, routing, server components |
+| TypeScript | Type safety |
+| Tailwind CSS + Shadcn UI | Styling and UI components |
+| React Hook Form + Zod | Form state and validation |
+| TanStack Query | Server state management / data fetching |
+| Custom JWT (via cookies + localStorage) | Authentication, protected via Next.js Middleware |
+| Stripe.js | Frontend payment flow |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## 👥 Roles
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- **Customer** — Browse gear, rent, pay via Stripe, track orders, leave reviews
+- **Provider** — Manage gear inventory (CRUD), manage incoming orders
+- **Admin** — Manage users, view all gear/rentals platform-wide
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Role is selected during registration and drives which dashboard/UI is shown.
+
+---
+
+## ⚙️ Setup Instructions
+
+1. Clone the repo
+
+   git clone https://github.com/your-username/gearup-frontend.git
+   cd gearup-frontend
+
+2. Install dependencies
+
+   npm install
+
+3. Create a `.env.local` file in the root:
+
+   NEXT_PUBLIC_API_URL=https://gearup-virid.vercel.app/api
+   NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_your_publishable_key
+
+4. Run the development server
+
+   npm run dev
+
+App runs on `http://localhost:3000`
+
+---
+
+## 📋 Routes
+
+| Route | Description |
+|-------|--------------|
+| `/` | Homepage with featured gear |
+| `/gear` | Browse & filter gear |
+| `/gear/[id]` | Gear details & rent CTA |
+| `/auth/register` | Registration form |
+| `/auth/login` | Login form |
+| `/dashboard/customer` | Customer overview, orders, payments |
+| `/dashboard/customer/orders/[id]/pay` | Payment initiation |
+| `/payment/success` | Stripe payment success page |
+| `/payment/cancel` | Stripe payment cancel page |
+| `/dashboard/provider` | Provider overview & inventory |
+| `/dashboard/provider/gear/new` | Add gear form |
+| `/dashboard/provider/orders` | Manage incoming orders |
+| `/dashboard/admin` | Admin overview & user management |
+
+All `/dashboard/*` routes are protected via Next.js Middleware and require the correct role.
+
+---
+
+## Key Features
+
+- Role-based authentication with JWT (cookie + localStorage), protected routes via Middleware
+- Client-side form validation (Zod + React Hook Form) with inline error messages
+- Consistent UI error handling — toast notifications, inline errors, error boundaries
+- Real Stripe payment flow with dedicated success/cancel pages
+- Optimistic UI updates via TanStack Query for order status changes
+- Skeleton loaders and error fallbacks on key routes
+- Dark mode UI built with Tailwind CSS + shadcn/ui
+
+See `API_INTEGRATION.md` for the full mapping between frontend components and backend endpoints.
