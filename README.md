@@ -10,10 +10,10 @@ A modern, responsive Next.js frontend for the GearUp sports and outdoor gear ren
 
 | Resource            | Link |
 |---------------------|------|
-| Frontend Repo       | https://github.com/your-username/gearup-frontend |
-| Live App            | https://your-frontend-app.vercel.app |
-| Backend Repo        | https://github.com/your-username/gearup-backend |
-| Backend Live API    | https://gearup-virid.vercel.app |
+| Frontend Repo       | https://github.com/AfsanaMim9639/gearup-frontend.git |
+| Live App            | https://gearup-frontend-five.vercel.app/ |
+| Backend Repo        | https://github.com/AfsanaMim9639/gearup.git |
+| Backend Live API    | https://gearup-virid.vercel.app/ |
 
 **Admin Credentials (for testing the deployed app)**
 - Email: `admin@gearup.com`
@@ -49,7 +49,7 @@ Role is selected during registration and drives which dashboard/UI is shown.
 
 1. Clone the repo
 
-   git clone https://github.com/your-username/gearup-frontend.git
+   git clone https://github.com/AfsanaMim9639/gearup-frontend.git
    cd gearup-frontend
 
 2. Install dependencies
