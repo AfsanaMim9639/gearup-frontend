@@ -1,14 +1,42 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
+import { toast } from "sonner";
 import { useAuth } from "@/context/AuthContext";
-import { useProviderGear } from "@/hooks/useProviderGear";
+import { useProviderGear, useDeleteGear } from "@/hooks/useProviderGear";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import { ApiError } from "@/lib/api-client";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+
 export default function ProviderDashboardPage() {
   const { user, logout } = useAuth();
   const { data: gearItems, isLoading, isError } = useProviderGear();
+  const deleteGear = useDeleteGear();
+
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteGear.mutateAsync(id);
+      toast.success("Gear item deleted");
+    } catch (error) {
+      if (error instanceof ApiError) {
+        toast.error(error.message);
+      } else {
+        toast.error("Something went wrong. Please try again.");
+      }
+    }
+  };
 
   return (
     <div className="mx-auto max-w-5xl p-8">
@@ -34,7 +62,6 @@ export default function ProviderDashboardPage() {
       </div>
 
       <div className="mt-8">
-        
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-semibold">Your Gear Listings</h2>
           <Button
@@ -67,7 +94,7 @@ export default function ProviderDashboardPage() {
             {gearItems.map((item) => (
               <div
                 key={item.id}
-                className="flex items-center gap-4 rounded-lg border p-4"
+                className="flex flex-wrap items-center gap-4 rounded-lg border p-4"
               >
                 <div className="relative h-16 w-16 flex-shrink:0 overflow-hidden rounded-md bg-muted">
                   <Image
@@ -79,7 +106,7 @@ export default function ProviderDashboardPage() {
                   />
                 </div>
 
-                <div className="flex-1">
+                <div className="min-w-37.5 flex-1">
                   <p className="font-semibold">{item.name}</p>
                   <p className="text-sm text-muted-foreground">
                     {item.category?.name} • ${item.pricePerDay.toFixed(2)}/day
@@ -92,6 +119,52 @@ export default function ProviderDashboardPage() {
                 ) : (
                   <Badge variant="destructive">Unavailable</Badge>
                 )}
+
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    nativeButton={false}
+                    render={
+                      <Link
+                        href={`/dashboard/provider/gear/${item.id}/edit`}
+                      />
+                    }
+                  >
+                    Edit
+                  </Button>
+                  <AlertDialog>
+                    <AlertDialogTrigger
+                      render={
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          disabled={deleteGear.isPending}
+                        />
+                      }
+                    >
+                      Delete
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Delete this gear item?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This will permanently remove &ldquo;{item.name}
+                          &rdquo; from your listings. This action cannot be
+                          undone.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={() => handleDelete(item.id)}
+                        >
+                          Delete
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </div>
               </div>
             ))}
           </div>
