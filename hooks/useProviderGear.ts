@@ -38,12 +38,13 @@ export function useUpdateGear() {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateGearInput }) =>
       api.put<GearItem>(`/provider/gear/${id}`, data),
-    onSuccess: () => {
+    onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ["provider-gear"] });
+      queryClient.invalidateQueries({ queryKey: ["gear", variables.id] });
+      queryClient.invalidateQueries({ queryKey: ["gear"] });
     },
   });
 }
-
 export function useDeleteGear() {
   const queryClient = useQueryClient();
   return useMutation({
