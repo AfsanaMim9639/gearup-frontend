@@ -7,6 +7,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useMyRentals } from "@/hooks/useRentals";
 import { RentalStatusBadge } from "@/components/rental-status-badge";
 import { Button } from "@/components/ui/button";
+import { ReviewDialog } from "@/components/review-dialog";
 
 export default function CustomerDashboardPage() {
   const { user, logout } = useAuth();
@@ -93,6 +94,11 @@ export default function CustomerDashboardPage() {
                         Total: ${order.totalAmount.toFixed(2)}
                       </p>
 
+                      <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
+                      <p className="font-semibold">
+                        Total: ${order.totalAmount.toFixed(2)}
+                      </p>
+
                       {order.status === "CONFIRMED" && (
                         <Button
                           size="sm"
@@ -106,6 +112,14 @@ export default function CustomerDashboardPage() {
                           Pay Now
                         </Button>
                       )}
+
+                      {order.status === "RETURNED" && (
+                        <ReviewDialog
+                          gearItemId={order.items[0].gearItemId}
+                          gearName={order.items[0].gearItem.name}
+                        />
+                      )}
+                    </div>
                     </div>
                   </div>
                 </div>
